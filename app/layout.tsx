@@ -3,8 +3,8 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "Stacks Reflex",
-  description: "Reaction-time game with an on-chain leaderboard on Stacks",
+  title: "Stacks Snake",
+  description: "On-chain Snake game on Stacks—move, score, and avoid the walls",
 };
 
 export default function RootLayout({
