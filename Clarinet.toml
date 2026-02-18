@@ -5,11 +5,11 @@ cache_dir = "./.cache"
 
 [contracts.activity]
 path = "contracts/activity.clar"
-clarity_version = 2
+clarity_version = 3
 
 [contracts.reflex]
 path = "contracts/reflex.clar"
-clarity_version = 2
+clarity_version = 3
 
 [repl.analysis]
 passes = ["check_checker"]
