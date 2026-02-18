@@ -1,0 +1,11 @@
+[project]
+name = "stacks-activity"
+description = "On-chain activity tracking for Stacks"
+cache_dir = "./.cache"
+
+[contracts.activity]
+path = "contracts/activity.clar"
+clarity_version = 2
+
+[repl.analysis]
+passes = ["check_checker"]
