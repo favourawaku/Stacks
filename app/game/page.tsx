@@ -6,11 +6,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const EXPLORER_TX = (txId: string, network: "mainnet" | "testnet") =>
-  network === "mainnet"
-    ? `https://explorer.hiro.so/txid/${txId}`
-    : `https://explorer.hiro.so/txid/${txId}?chain=testnet`;
-
 type GameState = "idle" | "waiting" | "go" | "done";
 
 export default function GamePage() {
