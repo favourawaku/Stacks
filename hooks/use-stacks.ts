@@ -2,7 +2,7 @@
 
 import { getLocalStorage, connect, disconnect, isConnected, openContractCall } from "@stacks/connect";
 import { PostConditionMode } from "@stacks/transactions";
-import { getRecordActivityTxOptions, getSubmitScoreTxOptions } from "@/lib/contract";
+import { getStartGameTxOptions, getMoveTxOptions, getSubmitScoreTxOptions } from "@/lib/contract";
 import { useEffect, useState } from "react";
 
 type UserData = {
@@ -47,10 +47,24 @@ export function useStacks() {
     handleUserData(null);
   }
 
-  /** Record one activity check-in on-chain. Returns txId or undefined if cancelled/failed. */
-  async function recordActivity(): Promise<string | undefined> {
+  /** Start a new snake game on-chain. Returns txId or undefined if cancelled/failed. */
+  async function startGame(): Promise<string | undefined> {
     if (typeof window === "undefined" || !userData || !network) return undefined;
-    const txOptions = getRecordActivityTxOptions(network);
+    const txOptions = getStartGameTxOptions(network);
+    return new Promise((resolve) => {
+      openContractCall({
+        ...txOptions,
+        postConditionMode: PostConditionMode.Allow,
+        onFinish: (data: { txId: string }) => resolve(data.txId),
+        onCancel: () => resolve(undefined),
+      });
+    });
+  }
+
+  /** Move snake: 0=up, 1=down, 2=left, 3=right. Returns txId or undefined. */
+  async function move(direction: 0 | 1 | 2 | 3): Promise<string | undefined> {
+    if (typeof window === "undefined" || !userData || !network) return undefined;
+    const txOptions = getMoveTxOptions(network, direction);
     return new Promise((resolve) => {
       openContractCall({
         ...txOptions,
@@ -84,7 +98,8 @@ export function useStacks() {
     network,
     connectWallet,
     disconnectWallet,
-    recordActivity,
+    startGame,
+    move,
     submitScore,
     address: userData?.addresses?.stx?.[0]?.address ?? null,
   };
