@@ -13,6 +13,8 @@ export default function GamePage() {
   const [state, setState] = useState<SnakeState | null>(null);
   const [loading, setLoading] = useState(false);
   const [moving, setMoving] = useState(false);
+  const [batchStarting, setBatchStarting] = useState(false);
+  const [batchProgress, setBatchProgress] = useState(0);
 
   const loadState = useCallback(async (): Promise<SnakeState | null> => {
     if (!address || !network) {
@@ -84,6 +86,38 @@ export default function GamePage() {
     }
   }
 
+  /** Start game 10 times in a row — you sign 10 transactions. */
+  async function handleStart10Games() {
+    if (!address) {
+      toast.error("Connect wallet first");
+      return;
+    }
+    setBatchStarting(true);
+    setBatchProgress(0);
+    let done = 0;
+    const toastId = toast.loading("Start game 0/10 — sign in wallet…");
+    try {
+      for (let i = 0; i < 10; i++) {
+        const txId = await startGame();
+        if (txId) {
+          done++;
+          setBatchProgress(done);
+          toast.loading(`Start game ${done}/10 — sign in wallet…`, { id: toastId });
+        } else {
+          toast.error(`Stopped at ${done}/10 (cancelled)`, { id: toastId });
+          break;
+        }
+      }
+      if (done === 10) {
+        toast.success("Started 10 games. You’re ready to play.", { id: toastId });
+        await loadState();
+      }
+    } finally {
+      setBatchStarting(false);
+      setBatchProgress(0);
+    }
+  }
+
   async function doMove(direction: 0 | 1 | 2 | 3) {
     if (!address || !state?.alive || moving) return;
     setMoving(true);
@@ -147,13 +181,23 @@ export default function GamePage() {
               ) : state === null ? (
                 <div className="text-center py-6">
                   <p className="text-slate-400 mb-4">No game in progress. Start a new game.</p>
-                  <button
-                    onClick={handleStartGame}
-                    disabled={loading}
-                    className="px-6 py-3 rounded-xl bg-[#00d4aa] text-[#0a0e17] font-semibold hover:bg-[#00f5c4] disabled:opacity-50 transition"
-                  >
-                    Start Game
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <button
+                      onClick={handleStartGame}
+                      disabled={loading || batchStarting}
+                      className="px-6 py-3 rounded-xl bg-[#00d4aa] text-[#0a0e17] font-semibold hover:bg-[#00f5c4] disabled:opacity-50 transition"
+                    >
+                      Start Game
+                    </button>
+                    <button
+                      onClick={handleStart10Games}
+                      disabled={loading || batchStarting}
+                      className="px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 disabled:opacity-50 transition"
+                    >
+                      {batchStarting ? `Starting ${batchProgress}/10…` : "Start 10 games"}
+                    </button>
+                  </div>
+                  <p className="text-slate-500 text-xs mt-3">Start 10 games = sign 10 transactions in a row.</p>
                 </div>
               ) : (
                 <>
@@ -235,14 +279,24 @@ export default function GamePage() {
                   </p>
 
                   {!state.alive && (
-                    <div className="mt-4 text-center">
-                      <button
-                        onClick={handleStartGame}
-                        disabled={loading}
-                        className="px-6 py-2.5 rounded-xl bg-[#00d4aa] text-[#0a0e17] font-semibold hover:bg-[#00f5c4] disabled:opacity-50 transition"
-                      >
-                        Start New Game
-                      </button>
+                    <div className="mt-4 text-center space-y-3">
+                      <p className="text-slate-400 text-sm">Start a new game or batch 10 to sign 10 txs.</p>
+                      <div className="flex flex-wrap gap-3 justify-center">
+                        <button
+                          onClick={handleStartGame}
+                          disabled={loading || batchStarting}
+                          className="px-6 py-2.5 rounded-xl bg-[#00d4aa] text-[#0a0e17] font-semibold hover:bg-[#00f5c4] disabled:opacity-50 transition"
+                        >
+                          Start New Game
+                        </button>
+                        <button
+                          onClick={handleStart10Games}
+                          disabled={loading || batchStarting}
+                          className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 disabled:opacity-50 transition"
+                        >
+                          {batchStarting ? `Starting ${batchProgress}/10…` : "Start 10 games"}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </>
