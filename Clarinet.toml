@@ -7,5 +7,9 @@ cache_dir = "./.cache"
 path = "contracts/activity.clar"
 clarity_version = 2
 
+[contracts.reflex]
+path = "contracts/reflex.clar"
+clarity_version = 2
+
 [repl.analysis]
 passes = ["check_checker"]
