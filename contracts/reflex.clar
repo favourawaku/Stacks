@@ -66,13 +66,13 @@
 (define-public (submit-score (score uint))
   (let (
     (sender (tx-sender))
-    (current (default-to u0 (map-get? best-score (tuple (who sender)))))
+    (current (default-to u0 (map-get? best-score sender)))
     (new-best (if (or (is-eq current u0) (< score current)) score current))
     (lb (var-get leaderboard))
     (entry (tuple (who sender) (score new-best)))
   )
   (asserts! (> score u0) (err u1))
-  (map-set best-score (tuple (who sender)) new-best)
+  (map-set best-score sender new-best)
   (let ((idx-opt (index-of-principal lb sender u0)))
     (var-set leaderboard
       (if (is-some idx-opt)
