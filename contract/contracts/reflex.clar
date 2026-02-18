@@ -78,8 +78,8 @@
       (if (is-eq (get who e6) sender) u6
       (if (is-eq (get who e7) sender) u7
       (if (is-eq (get who e8) sender) u8
-      (if (is-eq (get who e9) sender) u9 u9))))))))))
-    (sender-in-list (not (is-eq idx-found u9)))
+      (if (is-eq (get who e9) sender) u9 u0))))))))))
+    (sender-in-list (or (is-eq (get who e0) sender) (is-eq (get who e1) sender) (is-eq (get who e2) sender) (is-eq (get who e3) sender) (is-eq (get who e4) sender) (is-eq (get who e5) sender) (is-eq (get who e6) sender) (is-eq (get who e7) sender) (is-eq (get who e8) sender) (is-eq (get who e9) sender)))
     ;; Inline: worst (max) score index among non-empty
     (s0 (get score e0))
     (s1 (get score e1))
