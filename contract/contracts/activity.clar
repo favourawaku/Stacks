@@ -8,5 +8,6 @@
 
 ;; Records an activity check-in on-chain. Used by the Activity dashboard.
 (define-public (record-activity)
-  (var-set total-check-ins (+ (var-get total-check-ins) u1))
-  (ok true))
+  (begin
+    (var-set total-check-ins (+ (var-get total-check-ins) u1))
+    (ok true)))
