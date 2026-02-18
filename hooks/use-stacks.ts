@@ -2,7 +2,7 @@
 
 import { getLocalStorage, connect, disconnect, isConnected, openContractCall } from "@stacks/connect";
 import { PostConditionMode } from "@stacks/transactions";
-import { getRecordActivityTxOptions } from "@/lib/contract";
+import { getRecordActivityTxOptions, getSubmitScoreTxOptions } from "@/lib/contract";
 import { useEffect, useState } from "react";
 
 type UserData = {
@@ -61,6 +61,20 @@ export function useStacks() {
     });
   }
 
+  /** Submit reflex game score (reaction time in ms, lower = better). Returns txId or undefined. */
+  async function submitScore(scoreMs: number): Promise<string | undefined> {
+    if (typeof window === "undefined" || !userData || !network) return undefined;
+    const txOptions = getSubmitScoreTxOptions(network, scoreMs);
+    return new Promise((resolve) => {
+      openContractCall({
+        ...txOptions,
+        postConditionMode: PostConditionMode.Allow,
+        onFinish: (data: { txId: string }) => resolve(data.txId),
+        onCancel: () => resolve(undefined),
+      });
+    });
+  }
+
   useEffect(() => {
     if (isConnected()) handleUserData(getLocalStorage());
   }, []);
@@ -71,6 +85,7 @@ export function useStacks() {
     connectWallet,
     disconnectWallet,
     recordActivity,
+    submitScore,
     address: userData?.addresses?.stx?.[0]?.address ?? null,
   };
 }

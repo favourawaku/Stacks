@@ -1,3 +1,5 @@
+import { uintCV } from "@stacks/transactions";
+
 /**
  * Contract call options.
  * Activity: NEXT_PUBLIC_CONTRACT_ADDRESS / NEXT_PUBLIC_CONTRACT_NAME (default "activity").
@@ -31,7 +33,7 @@ export function getSubmitScoreTxOptions(network: Network, scoreMs: number) {
     contractAddress: REFLEX_CONTRACT_ADDRESS,
     contractName: REFLEX_CONTRACT_NAME,
     functionName: "submit-score",
-    functionArgs: [{ type: "uint", value: String(Math.round(scoreMs)) }],
+    functionArgs: [uintCV(Math.round(scoreMs))],
     network,
   };
 }
